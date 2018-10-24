@@ -232,7 +232,7 @@ var moreThan89 = function() {
   }
 };
 
-cartAppear = () => {
+let cartAppear = () => {
   let scroll = $(window).scrollTop(),
                docHeight = $(document).height(),
                windowHeight = $(window).height();
