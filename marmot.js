@@ -232,6 +232,17 @@ var moreThan89 = function() {
   }
 };
 
+cartAppear = () => {
+  let scroll = $(window).scrollTop(),
+               docHeight = $(document).height(),
+               windowHeight = $(window).height();
+  let scrollPercent = (scroll / (docHeight-windowHeight)) * 100;
+  if (scrollPercent > 89) {
+    console.log('Reached beyond 90%')
+    return true;
+  }
+}
+
 $(window).scroll( function() {
   if (moreThan89()) {
     $(this).off();
