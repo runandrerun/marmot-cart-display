@@ -18,11 +18,13 @@ parseCart = (cartData) => {
 
   if (products) {
     for (let i = 0; i < quantity; i++) {
-      console.log('Inside Loop', products[i].getElementsByClassName('mini-cart-name')[0].innerText)
+      console.log('Inside Loop', products[i])
       let newItem = {
         name: products[i].getElementsByClassName('mini-cart-name')[0].innerText,
         image: products[i].getElementsByClassName('mini-cart-image')[0].innerHTML,
         price: products[i].getElementsByClassName('mini-cart-price')[0].innerHTML,
+        pricing: products[i].getElementsByClassName('mini-cart-pricing')[0].innerHTML,
+        entireProduct: products[i].getElementsByClassName('mini-cart-product')
       }
       items.push(newItem)
       console.log('Items inside Loop', items)
@@ -43,6 +45,8 @@ handleCart = (cart) => {
   console.log('Inside Handle', cart)
   createModal(cart)
 }
+
+// Modal at the Bottom of Marmot
 
 createModal = (cartData) => {
 
@@ -107,32 +111,25 @@ createModal = (cartData) => {
   const cartContainer = document.createElement('div')
   let products = cartData.allItems
   products.forEach(product => {
+    let hr = document.createElement('hr')
     let productDiv = document.createElement('div')
-    productDiv.innerHTML = product.name
+    productDiv.id = product.name
+    let productTitle = document.createElement('h2')
+    productTitle.innerHTML = product.name
+    let productImage = document.createElement('div')
+    productImage.innerHTML = product.image
+    let price = document.createElement('h2')
+    price.innerHTML = product.price
+    let pricing = document.createElement('div')
+    pricing.innerHTML = product.pricing
+    let dv = document.createElement('div')
+    dv.innerHTML = product.entireProduct
+    productDiv.append(productTitle, productImage, price, pricing, hr, dv)
     cartContainer.append(productDiv)
   })
   lightBox.append(cartContainer)
   console.log('Inside Modal', products)
 
-
-
-//   function renderProducts(cartItems) {
-//   const onlineList = document.getElementById('online-list')
-//   let usernameArray = []
-//   onlineList.innerHTML = ""
-//   userArray.forEach(user => {
-//     usernameArray = usernameArray.concat(user.username)
-//   })
-//   usernameArray.sort().forEach(username => {
-//     const onlineNow = document.createElement('li')
-//     onlineNow.innerHTML = `
-//       <span style="color: #FC388E" class="user-list-text">
-//           <img src='./imgs/ducky.svg' class="user-icon"/> ${username}
-//       </span>
-//       `
-//     onlineList.append(onlineNow)
-//   })
-// }
 
   let msgDiv = $('<div id="msg-div"></div>').appendTo(lightBox);
     $('<br>').appendTo(msgDiv);
@@ -157,11 +154,6 @@ createModal = (cartData) => {
     'margin-left':'auto',
     'margin-right':'auto'
   });
-
-  var btn = document.createElement("BUTTON");        // Create a <button> element
-var t = document.createTextNode("CLICK ME");       // Create a text node
-btn.appendChild(t);                                // Append the text to <button>
-document.body.appendChild(btn);
 }
 
 
