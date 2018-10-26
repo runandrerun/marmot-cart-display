@@ -12,9 +12,11 @@ parseCart = (cartData) => {
   // Products
   let quantity = cartData.getElementsByClassName('mini-cart-product').length
   let products = cartData.getElementsByClassName('mini-cart-product')
-
+  let subtotal = cartData.getElementsByClassName('order-totals-table')[0].innerHTML
   // Store Every Product
   let items = []
+
+  console.log('Parse Cart', subtotal)
 
   if (products) {
     for (let i = 0; i < quantity; i++) {
@@ -24,7 +26,7 @@ parseCart = (cartData) => {
         image: products[i].getElementsByClassName('mini-cart-image')[0].innerHTML,
         price: products[i].getElementsByClassName('mini-cart-price')[0].innerHTML,
         pricing: products[i].getElementsByClassName('mini-cart-pricing')[0].innerHTML,
-        entireProduct: products[i].getElementsByClassName('mini-cart-product')
+        entireProduct: products[i].innerHTML
       }
       items.push(newItem)
       console.log('Items inside Loop', items)
@@ -36,7 +38,9 @@ parseCart = (cartData) => {
   // Cart Data
   const cart = {
     qty: quantity,
-    allItems: items
+    allItems: items,
+    total: subtotal,
+    logo: cartData.getElementsByClassName('logo-container')[1].innerHTML,
     }
   return cart
 }
@@ -47,6 +51,8 @@ handleCart = (cart) => {
 }
 
 // Modal at the Bottom of Marmot
+
+
 
 createModal = (cartData) => {
 
@@ -65,7 +71,8 @@ createModal = (cartData) => {
     'background-color':'rgba(0,0,0,0.7)',
     'height':'100%',
     'width':'100%',
-    'z-index':'10'
+    'z-index':'10',
+    'overflow':'hidden',
   });
 
   // LightBox container: Create, append, empty & style it:
@@ -73,9 +80,9 @@ createModal = (cartData) => {
   $(lightBox).empty();
 
   $(lightBox).css({
-    'background-color':'rgba(255,255,255,0.8)',
+    'background-color':'rgba(255,255,255,1)',
     'position':'absolute',
-    'border':'3px',
+    'border':'1px',
     'border-style':'solid',
     'border-color': '#1F1F2E',
     'z-index':'50',
@@ -87,25 +94,38 @@ createModal = (cartData) => {
     'overflow':'scroll',
   });
 
+
+  // Header
+  let boxLogoSpan = $('<span id="box-logo-span"></span>').appendTo(lightBox);
+  let boxLogo = $(`${cartData.logo}`).appendTo($(boxLogoSpan));
+  // <h1 id="box-logo" class="logo-image header-main-inner">MARMOT</a>
+  boxLogo.css({
+    'text-align': 'left',
+    'font-family': 'Proxima'
+  });
+
   // Create span with close button, append to lightBox, style button:
-  let closeButtonSpan = $('<span id="close-button-span"></span>').appendTo(lightBox);
-  let closeButton = $('<a id="close-button">Close</a>').appendTo($(closeButtonSpan));
+  // let closeButtonSpan = $('<span id="close-button-span"></span>').appendTo(lightBox);
+  let closeButton = $('<a id="close-button">Close</a>').appendTo($(boxLogoSpan));
   closeButton.css({
     'text-align': 'right',
   });
 
-  // Close modal functionality:
+  // Close Cart-Modal
   $('#close-button').click(function() {
     $(backdropDiv).fadeOut("slow");
+    $(window).scroll( function() {
+      // if (checkScroll) {
+      //   $(this).off();
+      //   fetchCart()
+      // }
+    });
   });
 
-  // Header
-  let boxLogoSpan = $('<span id="box-logo-span"></span>').appendTo(lightBox);
-  let boxLogo = $('<h1 id="box-logo">MARMOT</a>').appendTo($(boxLogoSpan));
-  boxLogo.css({
-    'text-align': 'center',
-    'font-family': 'Proxima'
-  });
+
+  // Separator
+  const separator = document.createElement('hr')
+  lightBox.append(separator)
 
   // Cart Info
   const cartContainer = document.createElement('div')
@@ -114,50 +134,34 @@ createModal = (cartData) => {
     let hr = document.createElement('hr')
     let productDiv = document.createElement('div')
     productDiv.id = product.name
-    let productTitle = document.createElement('h2')
-    productTitle.innerHTML = product.name
-    let productImage = document.createElement('div')
-    productImage.innerHTML = product.image
-    let price = document.createElement('h2')
-    price.innerHTML = product.price
-    let pricing = document.createElement('div')
-    pricing.innerHTML = product.pricing
+
     let dv = document.createElement('div')
     dv.innerHTML = product.entireProduct
-    productDiv.append(productTitle, productImage, price, pricing, hr, dv)
+    productDiv.append(dv, hr)
     cartContainer.append(productDiv)
   })
-  lightBox.append(cartContainer)
+
+  // Total
+  const total = document.createElement('div')
+  total.innerHTML = `<table><tr class="order-subtotal">
+    <td>Total Items </td>
+    <td>${cartData.qty}</td>
+  </tr>
+${cartData.total}</table>`
+
+  const visitCart = document.createElement('div')
+  visitCart.innerHTML = `<a href="https://www.marmot.com/cart" id="checkout-btn"><span class="checkout-button cart-button button">Cart</span></a>`
+  cartContainer.append(total)
+  lightBox.append(cartContainer, visitCart)
   console.log('Inside Modal', products)
-
-
-  let msgDiv = $('<div id="msg-div"></div>').appendTo(lightBox);
-    $('<br>').appendTo(msgDiv);
-    $('<h3 class="msg-spans"></h3>').text("Items: " + cartData.qty).appendTo(msgDiv);
-    $('<h3 class="msg-spans"></h3>').text("Subtotal: $" + subtotal).appendTo(msgDiv);
-    cartData.allItems.forEach(item => {
-      $(`<h2 id=${item.name}></h2>`).text(`${item.name}`).appendTo(msgDiv);
-    })
-    $('<br>').appendTo(msgDiv);
-    $('<br>').appendTo(msgDiv);
-    $('.msg-spans').css({
-        'text-align': 'center',
-        'font-family': 'Proxima',
-        'font-weight': 'normal',
-        'font-style': 'normal',
-        'color': '#008ec2',
-        'font-size':'25px'
-      });
-    $('<a href="https://www.marmot.com/cart" id="checkout-btn"><span class="checkout-button cart-button button">Cart</span></a>').appendTo(msgDiv);
-    $('.checkout-button').css({
-    'display': 'block',
-    'margin-left':'auto',
-    'margin-right':'auto'
-  });
 }
 
+// Used to Toggle the Cart & Prevent indefinite Load
 
-cartAppear = () => {
+let isOn = false;
+
+
+checkScroll = () => {
   let scroll = $(window).scrollTop(),
                docHeight = $(document).height(),
                windowHeight = $(window).height();
@@ -169,8 +173,14 @@ cartAppear = () => {
 }
 
 $(window).scroll( function() {
-  if (cartAppear()) {
+  if (checkScroll) {
     $(this).off();
     fetchCart()
   }
 });
+
+// window.addEventListener('scroll', (event) => {
+//     if (checkScroll()) {
+//       fetchCart()
+//     }
+// });

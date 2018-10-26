@@ -326,3 +326,32 @@ $(window).scroll( function() {
     });
   }
 });
+
+
+
+
+
+
+// let msgDiv = $('<div id="msg-div"></div>').appendTo(lightBox);
+//   $('<br>').appendTo(msgDiv);
+//   $('<h3 class="msg-spans"></h3>').text("Items: " + cartData.qty).appendTo(msgDiv);
+//   $('<h3 class="msg-spans"></h3>').text("Subtotal: $" + subtotal).appendTo(msgDiv);
+//   cartData.allItems.forEach(item => {
+//     $(`<h2 id=${item.name}></h2>`).text(`${item.name}`).appendTo(msgDiv);
+//   })
+//   $('<br>').appendTo(msgDiv);
+//   $('<br>').appendTo(msgDiv);
+//   $('.msg-spans').css({
+//       'text-align': 'center',
+//       'font-family': 'Proxima',
+//       'font-weight': 'normal',
+//       'font-style': 'normal',
+//       'color': '#008ec2',
+//       'font-size':'25px'
+//     });
+//   $('<a href="https://www.marmot.com/cart" id="checkout-btn"><span class="checkout-button cart-button button">Cart</span></a>').appendTo(msgDiv);
+//   $('.checkout-button').css({
+//   'display': 'block',
+//   'margin-left':'auto',
+//   'margin-right':'auto'
+// });
