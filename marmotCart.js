@@ -1,18 +1,20 @@
+// Parse HTML Response as there was no JSON response.
 fetchCart = () => {
   fetch(`api/v1/cart`).then(res => res.text()).then(html => {
-    // Parse HTML Response
     let parser = new DOMParser();
     let doc = parser.parseFromString(html, "text/html");
     return doc
-  }).then(html => parseCart(html)).then(handleCart)
+  }).then(parseCart).then(handleCart)
 }
 
+// This function gathers data from the parsed HTML from the fetch and creates a new object
 parseCart = (cartData) => {
 
   // Products
   let quantity = cartData.getElementsByClassName('mini-cart-product').length
   let products = cartData.getElementsByClassName('mini-cart-product')
   let subtotal = cartData.getElementsByClassName('order-totals-table')[0].innerHTML
+
   // Store Every Product
   let items = []
 
@@ -45,22 +47,19 @@ parseCart = (cartData) => {
   return cart
 }
 
+// This function is a stepping stone to the Modal creation
+
 handleCart = (cart) => {
-  console.log('Inside Handle', cart)
   createModal(cart)
 }
 
-// Modal at the Bottom of Marmot
-
-
+// Modal creation
 
 createModal = (cartData) => {
-
 
   let pageHeight = $(document).height();
   let pageWidth = $(window).width();
 
-  $('body').css({'overflow':'hidden'});
   // Backdrop div: Create, append & style it:
   let backdropDiv = $('<div id="backdrop"></div>').appendTo('body');
   $(backdropDiv).css({
@@ -73,6 +72,7 @@ createModal = (cartData) => {
     'height':'100%',
     'width':'100%',
     'z-index':'10',
+    'display':'none',
   });
 
   // LightBox container: Create, append, empty & style it:
@@ -92,8 +92,8 @@ createModal = (cartData) => {
     'left':'25%',
     'top':'10%',
     'overflow':'scroll',
+    'display':'none',
   });
-
 
   // Header
   let boxLogoSpan = $('<span id="box-logo-span"></span>').appendTo(lightBox);
@@ -104,25 +104,16 @@ createModal = (cartData) => {
   });
 
   // Create span with close button, append to lightBox, style button:
-  // let closeButtonSpan = $('<span id="close-button-span"></span>').appendTo(lightBox);
   let closeButton = $('<a id="close-button">Close</a>').appendTo($(boxLogoSpan));
   closeButton.css({
     'text-align': 'right',
+    'float': 'right',
   });
 
-  // Close Cart-Modal
+  // Close Cart Functionality
   $('#close-button').click(function() {
     $(backdropDiv).fadeOut("slow");
-    $('body').css({'overflow':'scroll'});
-    $(window).scroll( function() {
-      if (checkScroll) {
-        $(this).off();
-        fetchCart()
-      }
-    });
-    // $(backdropDiv).on('hidden.bs.modal', function () {
-    //   window.alert('hidden event fired!');
-    // });
+    toggleCartOff()
   });
 
 
@@ -144,14 +135,15 @@ createModal = (cartData) => {
     cartContainer.append(productDiv)
   })
 
-  // Total
+  // Total Info
   const total = document.createElement('div')
   total.innerHTML = `<table><tr class="order-subtotal">
     <td>Total Items </td>
     <td>${cartData.qty}</td>
-  </tr>
-${cartData.total}</table>`
+    </tr>
+    ${cartData.total}</table>`
 
+  // Cart + Checkout Button. This redirects the user to the Checkout/Cart
   const visitCart = document.createElement('div')
   visitCart.innerHTML = `<a href="https://www.marmot.com/cart" id="checkout-btn"><span class="checkout-button cart-button button">Cart</span></a>`
   cartContainer.append(total)
@@ -159,13 +151,7 @@ ${cartData.total}</table>`
   console.log('Inside Modal', products)
 }
 
-// Used to Toggle the Cart & Prevent indefinite Load
-
-const isOn = document.createElement('div')
-isOn.id = 'isOn'
-isOn.dataset.toggle = 'false'
-// $('isOn').css({'visibility':'hidden'})
-
+// This function vets the positioning of the scrollbar at all times
 
 checkScroll = () => {
   let scroll = $(window).scrollTop(),
@@ -176,18 +162,28 @@ checkScroll = () => {
     console.log('Reached beyond 90%')
     return true;
   }
-}
+};
 
-$(window).scroll( function() {
-  if (checkScroll) {
-    $(this).off();
-    fetchCart()
+// This Event Listener utilizes the checkScroll function to determine when to toggle the modal on
+window.addEventListener('scroll', () => {
+  if (checkScroll()) {
+    toggleCartOn();
   }
 });
 
-// window.addEventListener('scroll', (event) => {
-//     if (checkScroll()) {
-//       $(this).off();
-//       fetchCart()
-//     }
-// });
+toggleCartOn = () => {
+  // Uncomment the below to stop scrolling after cart is toggled on.
+  // $('body').css({'overflow':'hidden'})
+  $('#backdrop').css({'display':'inline'})
+  $('#lightBox').css({'display':'inline'})
+};
+
+toggleCartOff = () => {
+  // Uncomment the below to start scrolling after cart is toggled off.
+  // $('body').css({'overflow':'scroll'})
+  $('#backdrop').css({'display':'none'})
+  $('#lightBox').css({'display':'none'})
+};
+
+// Run the below function to start
+fetchCart()
