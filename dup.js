@@ -1,5 +1,3 @@
-// Please copy every line of code into the browser during testing. fetchCart() [at the bottom] is the key starter
-
 // Parse HTML Response as there was no JSON response.
 fetchCart = () => {
   fetch(`api/v1/cart`).then(res => res.text()).then(html => {
@@ -9,43 +7,25 @@ fetchCart = () => {
   }).then(parseCart).then(createModal)
 }
 
-// This is a helper method to count the quantity per item in a user's cart
-
-quantityChecker = (products) => {
-  let totalQty = 0;
-  if (products) {
-    for (let i = 0; i < products.length; i++) {
-      let qtyInt = parseInt(products[i].getElementsByClassName('mini-cart-pricing')[0].getElementsByClassName('value')[0].innerText)
-      totalQty += qtyInt
-    }
-    return totalQty
-  } else {
-    return totalQty
-  }
-}
-
 // This function gathers data from the parsed HTML from the fetch and creates a new object
-
 parseCart = (cartData) => {
 
   // Products
+  let quantity = cartData.getElementsByClassName('mini-cart-product').length
   let products = cartData.getElementsByClassName('mini-cart-product')
   let subtotal = cartData.getElementsByClassName('order-totals-table')[0].innerHTML
-  let quantity = quantityChecker(products)
 
   // Store Every Product
-
   let items = []
-
   // Loop over Products Array to Creat Individual Objects
   if (products) {
-    for (let i = 0; i < products.length; i++) {
+    for (let i = 0; i < quantity; i++) {
       let newItem = {
         entireProduct: products[i].innerHTML,
       }
       items.push(newItem)
     }
-  } else {
+  }   else {
     null
   }
 
@@ -82,10 +62,10 @@ createModal = (cartData) => {
   });
 
   // Modal - All Content will be displayed here
-  let cartModal = $('<div id="cartModal"></div>').appendTo($(backdropDiv));
-  $(cartModal).empty();
+  let lightBox = $('<div id="lightBox"></div>').appendTo($(backdropDiv));
+  $(lightBox).empty();
 
-  $(cartModal).css({
+  $(lightBox).css({
     'background-color':'rgba(255,255,255,1)',
     'position':'absolute',
     'border':'1px',
@@ -102,7 +82,7 @@ createModal = (cartData) => {
   });
 
   // Header - Marmot Logo and Close button to the right
-  let boxLogoSpan = $('<span id="box-logo-span"></span>').appendTo(cartModal);
+  let boxLogoSpan = $('<span id="box-logo-span"></span>').appendTo(lightBox);
   let boxLogo = $(`${cartData.logo}`).appendTo($(boxLogoSpan));
   boxLogo.css({
     'text-align': 'left',
@@ -125,7 +105,7 @@ createModal = (cartData) => {
 
   // Separator
   const separator = document.createElement('hr')
-  cartModal.append(separator)
+  lightBox.append(separator)
 
   // Cart Info - Items and Pricing Per Item and Quantity of Item
   const cartContainer = document.createElement('div')
@@ -153,7 +133,8 @@ createModal = (cartData) => {
   const visitCart = document.createElement('div')
   visitCart.innerHTML = `<a href="https://www.marmot.com/cart" id="checkout-btn"><span class="checkout-button cart-button button">Cart</span></a>`
   cartContainer.append(total)
-  cartModal.append(cartContainer, visitCart)
+  lightBox.append(cartContainer, visitCart)
+  console.log('Inside Modal', products)
 }
 
 // This function vets the positioning of the scrollbar at all times
@@ -164,6 +145,7 @@ checkScroll = () => {
                windowHeight = $(window).height();
   let scrollPercent = (scroll / (docHeight-windowHeight)) * 100;
   if (scrollPercent > 89) {
+    console.log('Reached beyond 90%')
     return true;
   }
 };
@@ -179,15 +161,32 @@ toggleCartOn = () => {
   // Uncomment the below to stop scrolling after cart is toggled on.
   // $('body').css({'overflow':'hidden'})
   $('#backdrop').css({'display':'inline'})
-  $('#cartModal').css({'display':'inline'})
+  $('#lightBox').css({'display':'inline'})
 };
 
 toggleCartOff = () => {
   // Uncomment the below to start scrolling after cart is toggled off.
   // $('body').css({'overflow':'scroll'})
   $('#backdrop').css({'display':'none'})
-  $('#cartModal').css({'display':'none'})
+  $('#lightBox').css({'display':'none'})
 };
 
 // Run the below function to start
 fetchCart()
+
+
+allProducts = (products) => {
+  // Store Every Product
+  let items = []
+  // Loop over Products Array to Creat Individual Objects
+  if (products) {
+    for (let i = 0; i < products.length; i++) {
+      let newItem = {
+        entireProduct: products[i].innerHTML,
+      }
+      items.push(newItem)
+    } return items
+  } else {
+    return items
+  }
+}
